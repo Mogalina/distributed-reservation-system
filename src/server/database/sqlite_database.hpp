@@ -5,6 +5,7 @@
 
 namespace database {
 
+// SQLite implementation of the Database interface
 class SqliteDatabase : public Database {
 public:
   SqliteDatabase();
@@ -17,6 +18,7 @@ public:
   bool query(const std::string& sql, std::vector<Row>& result) override;
 
 private:
+  // SQLite database connection handle
   sqlite3* db_;
 };
 
