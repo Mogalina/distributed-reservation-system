@@ -90,6 +90,9 @@ CREATE INDEX IF NOT EXISTS idx_reservations_event
 CREATE INDEX IF NOT EXISTS idx_reservations_user
     ON reservations(user_id);
 
+CREATE INDEX IF NOT EXISTS idx_users_username
+    ON users(username);
+
 CREATE INDEX IF NOT EXISTS idx_payments_reservation
     ON payments(reservation_id);
 
