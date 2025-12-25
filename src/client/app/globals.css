@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+:root {
+  --bg-color: #ffffff; 
+  --card-bg: #000000; 
+  --text-main: #ffffff; 
+  --text-secondary: #a1a1a6; 
+  --accent: #0071e3;
+  
+  --input-bg: #1c1c1e;       
+  --input-border: #333333;
+  --input-text: #ffffff;
+
+  --button-bg: #ffffff;
+  --button-text: #000000;
+  
+  --error: #ff453a;
+  --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-stack);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0; 
+}
+
+h1 { 
+  font-weight: 700; 
+  font-size: 28px; 
+  letter-spacing: -0.02em; 
+  margin-bottom: 8px; 
+}
+
+p { 
+  color: var(--text-secondary); 
+  font-size: 15px; 
+  line-height: 1.5; 
+}
+
+.container { 
+  width: 100%; 
+  max-width: 420px; 
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.text-center { 
+  text-align: center; 
+}
+
+.mb-4 { 
+  margin-bottom: 24px; 
+}
+
+.mt-4 { 
+  margin-top: 24px; 
+}
+
+.error-msg {
+  color: var(--error);
+  font-size: 13px;
+  margin-bottom: 15px;
+  text-align: center;
+  background: rgba(255, 69, 58, 0.15);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 24px;
+  font-weight: 500;
+  width: 100%;
+  transition: color 0.2s;
+}
+
+.link-btn:hover {
+  color: var(--text-main);
+  text-decoration: underline;
+}
