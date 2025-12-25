@@ -1,0 +1,19 @@
+# Editor files
+.vscode/
+.idea/
+
+# Generated files
+/dist/
+/build/
+/node_modules/
+
+# Logs
+logs/
+*.log
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
