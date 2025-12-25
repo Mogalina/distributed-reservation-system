@@ -17,10 +17,9 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = useState({
-    userId: '',
-    nationalId: '',
-    firstName: '',
-    lastName: ''
+    username: '',
+    password: '',
+    nationalId: ''
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -33,9 +32,21 @@ export default function AuthPage() {
     setLoading(true);
     try {
       const endpoint = isRegistering ? 'register' : 'login';
-      const res = await authRequest(endpoint, formData);
       
-      login({ userId: res.userId, token: res.token });
+      const payload = {
+        username: formData.username,
+        password: formData.password,
+        ...(isRegistering && { nationalId: formData.nationalId })
+      };
+
+      const res = await authRequest(endpoint, payload);
+      
+      login({ 
+        userId: res.userId, 
+        username: formData.username,
+        token: res.token 
+      });
+      
       router.push('/');
     } catch (err: any) {
       setError(err.message);
@@ -50,50 +61,41 @@ export default function AuthPage() {
         <div className="text-center mb-4">
           <div style={{ width: '40px', height: '40px', background: '#000', borderRadius: '50%', margin: '0 auto 15px' }}></div>
           <h1>{isRegistering ? 'Create Account' : 'Welcome Back'}</h1>
-          <p>{isRegistering ? 'Join the reservation system.' : 'Please enter your details.'}</p>
+          <p>{isRegistering ? 'Join the reservation system.' : 'Please enter your credentials.'}</p>
         </div>
 
         {error && <div className="error-msg">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <Input 
-            label="User ID"
-            name="userId" 
-            placeholder="username" 
-            value={formData.userId} 
+            label="Username"
+            name="username" 
+            placeholder="johndoe" 
+            value={formData.username} 
+            onChange={handleChange} 
+            required 
+          />
+
+          <Input 
+            label="Password"
+            name="password" 
+            type="password"
+            placeholder="••••••••" 
+            value={formData.password} 
             onChange={handleChange} 
             required 
           />
 
           {isRegistering && (
-            <>
-              <Input 
-                label="First Name"
-                name="firstName" 
-                placeholder="John" 
-                value={formData.firstName} 
-                onChange={handleChange} 
-                required 
-              />
-              <Input 
-                label="Last Name"
-                name="lastName" 
-                placeholder="Doe" 
-                value={formData.lastName} 
-                onChange={handleChange} 
-                required 
-              />
-            </>
+            <Input 
+              label="National ID"
+              name="nationalId" 
+              placeholder="0000000000000" 
+              value={formData.nationalId} 
+              onChange={handleChange} 
+              required 
+            />
           )}
-
-          <Input 
-            label="National ID"
-            name="nationalId" 
-            placeholder="Your unique ID" 
-            value={formData.nationalId} 
-            onChange={handleChange} 
-            required 
-          />
 
           <Button disabled={loading}>
             {loading ? 'Processing...' : (isRegistering ? 'Sign Up' : 'Sign In')}

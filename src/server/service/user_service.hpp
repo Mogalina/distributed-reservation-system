@@ -11,6 +11,12 @@ class UserService : public Service<models::User, std::string> {
 public:
   explicit UserService(repository::UserRepository& repo);
 
+  models::User registerUser(const std::string& username, 
+                            const std::string& password, 
+                            const std::string& nationalId);
+  std::optional<models::User> authenticate(const std::string& username, 
+                                           const std::string& password);
+
   models::User create(const models::User& user) override;
   std::optional<models::User> getById(const std::string& id) override;
   std::vector<models::User> getAll() override;

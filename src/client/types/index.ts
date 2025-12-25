@@ -1,5 +1,6 @@
 export interface User {
   userId: string;
+  username: string;
   token: string;
 }
 
@@ -11,8 +12,7 @@ export interface AuthResponse {
 }
 
 export interface AuthRequestData {
-  userId: string;
-  nationalId: string;
-  firstName?: string;
-  lastName?: string;
+  username: string;
+  password: string;
+  nationalId?: string;
 }

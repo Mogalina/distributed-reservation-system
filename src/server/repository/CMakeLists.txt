@@ -11,4 +11,5 @@ target_include_directories(repository
 target_link_libraries(repository 
     PUBLIC 
         database
+        models
 )

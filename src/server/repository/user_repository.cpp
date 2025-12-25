@@ -8,9 +8,9 @@ UserRepository::UserRepository(database::SqliteDatabase& db) : db_(db) {}
 
 models::User UserRepository::create(const models::User& user) {
   std::stringstream sql;
-  sql << "INSERT INTO users (user_id, first_name, last_name, national_id) "
-         "VALUES ('" << user.userId << "','" << user.firstName << "','"
-      << user.lastName << "','" << user.nationalId << "');";
+    sql << "INSERT INTO users (user_id, username, password_hash, national_id) "
+            "VALUES ('" << user.userId << "','" << user.username << "','" 
+        << user.passwordHash << "','" << user.nationalId << "');";
 
   db_.execute(sql.str());
   return user;
@@ -19,7 +19,7 @@ models::User UserRepository::create(const models::User& user) {
 std::optional<models::User> UserRepository::read(const std::string& id) {
   std::vector<database::Row> rows;
   std::stringstream sql;
-  sql << "SELECT user_id, first_name, last_name, national_id "
+  sql << "SELECT user_id, username, password_hash, national_id "
          "FROM users WHERE user_id='" << id << "';";
 
   if (!db_.query(sql.str(), rows) || rows.empty()) {
@@ -32,7 +32,7 @@ std::optional<models::User> UserRepository::read(const std::string& id) {
 
 std::vector<models::User> UserRepository::readAll() {
   std::vector<database::Row> rows;
-  db_.query("SELECT user_id, first_name, last_name, national_id FROM users;",
+  db_.query("SELECT user_id, username, password_hash, national_id FROM users;",
     rows);
 
   std::vector<models::User> result;
@@ -47,10 +47,23 @@ std::vector<models::User> UserRepository::readAll() {
   return result;
 }
 
+std::optional<models::User> 
+UserRepository::findByUsername(const std::string& username) {
+  std::vector<database::Row> rows;
+  std::stringstream sql;
+  sql << "SELECT user_id, username, password_hash, national_id "
+         "FROM users WHERE username='" << username << "';";
+
+  if (!db_.query(sql.str(), rows) || rows.empty()) return std::nullopt;
+
+  const auto& r = rows[0];
+  return models::User{r.columns[0], r.columns[1], r.columns[2], r.columns[3]};
+}
+
 models::User UserRepository::update(const models::User& user) {
   std::stringstream sql;
-  sql << "UPDATE users SET first_name='" << user.firstName
-      << "', last_name='" << user.lastName
+  sql << "UPDATE users SET username='" << user.username
+      << "', password_hash='" << user.passwordHash
       << "', national_id='" << user.nationalId
       << "' WHERE user_id='" << user.userId << "';";
 

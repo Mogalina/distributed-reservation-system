@@ -1,17 +1,6 @@
 #include "user_controller.hpp"
 #include <iostream>
 
-// Serialization macro for models::User
-namespace models {
-  NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-    User, 
-    userId, 
-    firstName, 
-    lastName, 
-    nationalId
-  )
-}
-
 namespace controller {
 
 UserController::UserController(service::UserService& service) 

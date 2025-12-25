@@ -36,30 +36,18 @@ http::HttpResponse AuthController::handleRequest(const http::HttpRequest& req) {
 
 http::HttpResponse AuthController::login(const http::HttpRequest& req) {
   try {
-    auto jsonBody = nlohmann::json::parse(req.body);
-    
-    // Extract user identifier
-    if (!jsonBody.contains("userId")) {
-      return http::HttpResponse::make(400, 
-        R"({"error": "Missing user identifier"})");
-    }
-    std::string userId = jsonBody["userId"];
+    auto json = nlohmann::json::parse(req.body);
+    std::string username = json.value("username", "");
+    std::string password = json.value("password", "");
 
-    // Verify credentials
-    auto userOpt = userService_.getById(userId);
-    if (!userOpt) {
-      return http::HttpResponse::make(401, 
-        R"({"error": "Invalid credentials"})");
+    auto user = userService_.authenticate(username, password);
+    if (user) {
+      std::string token = security_.generateToken(user->userId);
+      return http::HttpResponse::make(200, 
+        nlohmann::json({{"token", token}, {"userId", user->userId}}).dump());
     }
 
-    // Generate Token
-    std::string token = security_.generateToken(userId);
-    
-    nlohmann::json response;
-    response["token"] = token;
-    response["userId"] = userId;
-    
-    return http::HttpResponse::make(200, response.dump());
+    return http::HttpResponse::make(401, R"({"error": "Invalid credentials"})");
 
   } catch (const std::exception& e) {
     return http::HttpResponse::make(500, 
@@ -69,36 +57,26 @@ http::HttpResponse AuthController::login(const http::HttpRequest& req) {
 
 http::HttpResponse AuthController::registerUser(const http::HttpRequest& req) {
   try {
-    auto jsonBody = nlohmann::json::parse(req.body);
-    
-    // Manual mapping or use the macro from previous context if available
-    models::User user;
-    user.userId = jsonBody.value("userId", "");
-    user.firstName = jsonBody.value("firstName", "");
-    user.lastName = jsonBody.value("lastName", "");
-    user.nationalId = jsonBody.value("nationalId", "");
+    auto json = nlohmann::json::parse(req.body);
+    std::string username = json.value("username", "");
+    std::string password = json.value("password", "");
+    std::string nationalId = json.value("nationalId", "");
 
-    if (user.userId.empty() || user.nationalId.empty()) {
-        return http::HttpResponse::make(400, 
-          R"({"error": "Missing required fields"})");
+    if(username.empty() || password.empty() || nationalId.empty()) {
+      return http::HttpResponse::make(400, R"({"error": "Missing fields"})");
     }
 
-    // Check if user already exists
-    if (userService_.getById(user.userId)) {
-      return http::HttpResponse::make(409,
-        R"({"error": "User already exists"})");
+    try {
+      auto user = userService_.registerUser(username, password, nationalId);
+      return http::HttpResponse::make(201, nlohmann::json({
+        {"message", "Created"}, 
+        {"userId", user.userId}
+      }).dump());
+
+    } catch (const std::exception& e) {
+      return http::HttpResponse::make(409, 
+        nlohmann::json({{"error", e.what()}}).dump());
     }
-
-    userService_.create(user);
-    
-    // Auto-login after register
-    std::string token = security_.generateToken(user.userId);
-    
-    nlohmann::json response;
-    response["message"] = "User created successfully";
-    response["token"] = token;
-
-    return http::HttpResponse::make(201, response.dump());
 
   } catch (const std::exception& e) {
     return http::HttpResponse::make(500, 

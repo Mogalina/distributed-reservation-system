@@ -127,7 +127,7 @@ http::HttpRequest Server::parseRequest(const std::string& rawData) {
 }
 
 void Server::handleClient(int clientSocket, std::string clientIp) {
-  char buffer[1024];
+  char buffer[4096];
 
   while (isRunning_) {
     memset(buffer, 0, sizeof(buffer));
@@ -139,17 +139,27 @@ void Server::handleClient(int clientSocket, std::string clientIp) {
     }
     
     std::string rawRequest(buffer);
-    std::cout << std::endl << "Request: " << rawRequest 
-              << std::endl << std::endl;
+    std::cout << "\nRequest: " << rawRequest << std::endl << std::endl;
 
     // Parse and handle request
     auto req = parseRequest(rawRequest);
-    auto resp = authController_.handleRequest(req);
+    http::HttpResponse resp;
+
+    // Handle OPTIONS method for CORS preflight
+    if (req.method == http::Method::OPTIONS) {
+      resp = http::HttpResponse::make(200);
+    } else {
+      // Delegate to AuthController
+      resp = authController_.handleRequest(req);
+    }
 
     // Format response
     std::stringstream responseStream;
     responseStream << "HTTP/1.1 " << resp.statusCode << " OK\r\n";
     responseStream << "Content-Type: application/json\r\n";
+    responseStream << "Access-Control-Allow-Origin: *\r\n";
+    responseStream << "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n";
+    responseStream << "Access-Control-Allow-Headers: Content-Type, Authorization\r\n";
     responseStream << "Content-Length: " << resp.body.size() << "\r\n";
     responseStream << "\r\n";
     responseStream << resp.body;

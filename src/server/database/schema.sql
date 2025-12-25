@@ -2,8 +2,8 @@ PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS users (
     user_id        TEXT PRIMARY KEY,
-    first_name     TEXT NOT NULL,
-    last_name      TEXT NOT NULL,
+    username       TEXT NOT NULL UNIQUE,
+    password_hash  TEXT NOT NULL,
     national_id    TEXT NOT NULL UNIQUE
 );
 

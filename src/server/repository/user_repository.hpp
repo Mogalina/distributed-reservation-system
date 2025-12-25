@@ -16,6 +16,7 @@ public:
   models::User create(const models::User& user) override;
   std::optional<models::User> read(const std::string& id) override;
   std::vector<models::User> readAll() override;
+  std::optional<models::User> findByUsername(const std::string& username);
   models::User update(const models::User& user) override;
   void deleteItem(const std::string& id) override;
 

@@ -28,6 +28,7 @@ struct HttpRequest {
     if (m == "POST") return Method::POST;
     if (m == "PUT") return Method::PUT;
     if (m == "DELETE") return Method::DELETE;
+    if (m == "OPTIONS") return Method::OPTIONS;
     return Method::UNKNOWN;
   }
 };

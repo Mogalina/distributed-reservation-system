@@ -22,7 +22,7 @@ export default function HomePage() {
     <div className="container text-center">
       <Card>
         <p style={{ textTransform: 'uppercase', letterSpacing: '2px', fontSize: '12px', marginBottom: '10px' }}>Dashboard</p>
-        <h1 style={{ fontSize: '32px', marginBottom: '10px' }}>Hello, {user?.userId}</h1>
+        <h1 style={{ fontSize: '32px', marginBottom: '10px' }}>Hello, {user.username}</h1>
         <p className="mb-4">You are successfully logged in.</p>
         
         <Button 
