@@ -15,6 +15,13 @@ target_include_directories(security
     PUBLIC 
         $ENV{HOME}/jwt-cpp/include
         OpenSSL::SSL
+        ${OPENSSL_INCLUDE_DIR}
+        ${nlohmann_json_INCLUDE_DIRS}
+)
+
+target_link_libraries(security 
+    PUBLIC 
+        OpenSSL::SSL
         OpenSSL::Crypto
         nlohmann_json::nlohmann_json
 )

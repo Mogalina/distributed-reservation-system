@@ -17,5 +17,6 @@ target_link_libraries(controller
     PUBLIC 
         service
         security
+        middleware
         nlohmann_json::nlohmann_json
 )

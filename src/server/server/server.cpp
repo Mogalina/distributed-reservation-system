@@ -1,11 +1,13 @@
 #include "server.hpp"
 #include <iostream>
 #include <cstring>
+#include <sstream>
 
 namespace server {
 
-Server::Server(const std::string& host, uint16_t port) : host_(host), 
-                                                         port_(port) {
+Server::Server(const std::string& host, uint16_t port, 
+               controller::AuthController& authController)
+    : host_(host), port_(port), authController_(authController) {
   // Create server socket                                                        
   serverSocket_ = socket(AF_INET, SOCK_STREAM, 0);
   if (serverSocket_ < 0) {
@@ -97,6 +99,33 @@ void Server::acceptConnections() {
   }
 }
 
+http::HttpRequest Server::parseRequest(const std::string& rawData) {
+  http::HttpRequest req;
+  std::istringstream stream(rawData);
+  std::string line;
+
+  // Parse request line
+  if (std::getline(stream, line)) {
+    std::istringstream lineStream(line);
+    std::string methodStr, path;
+    lineStream >> methodStr >> path;
+    req.method = http::HttpRequest::stringToMethod(methodStr);
+    req.path = path;
+  }
+
+  // Skip headers for simplicity
+  while (std::getline(stream, line) && line != "\r") {
+    if (line.empty() || line == "\r") break;
+  }
+
+  // Read body
+  std::stringstream bodyStream;
+  bodyStream << stream.rdbuf();
+  req.body = bodyStream.str();
+  
+  return req;
+}
+
 void Server::handleClient(int clientSocket, std::string clientIp) {
   char buffer[1024];
 
@@ -108,7 +137,25 @@ void Server::handleClient(int clientSocket, std::string clientIp) {
       std::cout << "Client disconnected: " << clientIp << std::endl;
       break;
     }
-    std::cout << "Received from " << clientIp << ": " << buffer << std::endl;
+    
+    std::string rawRequest(buffer);
+    std::cout << std::endl << "Request: " << rawRequest 
+              << std::endl << std::endl;
+
+    // Parse and handle request
+    auto req = parseRequest(rawRequest);
+    auto resp = authController_.handleRequest(req);
+
+    // Format response
+    std::stringstream responseStream;
+    responseStream << "HTTP/1.1 " << resp.statusCode << " OK\r\n";
+    responseStream << "Content-Type: application/json\r\n";
+    responseStream << "Content-Length: " << resp.body.size() << "\r\n";
+    responseStream << "\r\n";
+    responseStream << resp.body;
+
+    std::string responseStr = responseStream.str();
+    send(clientSocket, responseStr.c_str(), responseStr.size(), 0);
   }
 
   // Remove client from the clients map and close the socket

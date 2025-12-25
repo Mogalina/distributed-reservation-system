@@ -1,8 +1,15 @@
 #include "auth_controller.hpp"
+#include "middleware/auth_middleware.hpp"
 #include <nlohmann/json.hpp>
 #include <iostream>
 
 namespace controller {
+
+namespace {
+
+using middleware::authMiddleware;
+
+}  // namespace
 
 AuthController::AuthController(service::UserService& userService, 
                                security::Security& security)
@@ -100,6 +107,12 @@ http::HttpResponse AuthController::registerUser(const http::HttpRequest& req) {
 }
 
 http::HttpResponse AuthController::logout(const http::HttpRequest& req) {
+  std::string userId;
+  if (authMiddleware(req, security_, userId).statusCode != 200) {
+    return http::HttpResponse::make(401, 
+      R"({"error": "Unauthorized"})");
+  }
+
   // For JWT, logout is typically handled client-side by discarding the token
   return http::HttpResponse::make(200, 
     R"({"message": "Logged out successfully"})");

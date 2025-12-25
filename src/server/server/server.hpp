@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <sstream>
 #include <unordered_map>
 #include <thread>
 #include <mutex>
@@ -8,12 +9,15 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include "http/http_types.hpp"
+#include "controller/auth_controller.hpp"
 
 namespace server {
 
 class Server {
 public:
-  Server(const std::string& host, uint16_t port);
+  Server(const std::string& host, uint16_t port, 
+         controller::AuthController& authController);
   ~Server();
 
   // Starts the server to listen for incoming connections.
@@ -33,9 +37,15 @@ private:
   // Handles communication with a connected client.
   void handleClient(int clientSocket, std::string clientIp);
 
+  // Helper to parse raw HTTP (very basic implementation)
+  http::HttpRequest parseRequest(const std::string& rawData);
+
   std::string host_;
   uint16_t port_;
   int serverSocket_;
+
+  // Reference to the controller
+  controller::AuthController& authController_;
 
   // Maps client IP addresses to their socket descriptors.
   std::unordered_map<std::string, int> clients_;
