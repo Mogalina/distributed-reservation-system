@@ -13,6 +13,7 @@ add_library(security STATIC
 
 target_include_directories(security 
     PUBLIC 
+        $ENV{HOME}/jwt-cpp/include
         OpenSSL::SSL
         OpenSSL::Crypto
         nlohmann_json::nlohmann_json

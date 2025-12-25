@@ -3,6 +3,7 @@ include_directories(${nlohmann_json_INCLUDE_DIRS})
 
 add_library(controller STATIC 
     user_controller.cpp
+    auth_controller.cpp
 )
 
 target_include_directories(controller 
@@ -15,5 +16,6 @@ target_include_directories(controller
 target_link_libraries(controller 
     PUBLIC 
         service
+        security
         nlohmann_json::nlohmann_json
 )
