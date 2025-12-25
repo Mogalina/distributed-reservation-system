@@ -1,0 +1,13 @@
+# Enviroment files
+.env
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Build files
+build/
+
+# Editor directories and files
+.vscode/
+.idea/
