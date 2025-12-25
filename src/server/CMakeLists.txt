@@ -12,6 +12,9 @@ add_subdirectory(middleware)
 add_subdirectory(security)
 add_subdirectory(models)
 add_subdirectory(repository)
+add_subdirectory(service)
+add_subdirectory(http)
+add_subdirectory(controller)
 
 add_executable(runner main.cpp)
 
@@ -24,4 +27,7 @@ target_link_libraries(runner
         security
         models
         repository
+        service
+        http
+        controller
 )
