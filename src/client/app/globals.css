@@ -27,10 +27,10 @@
 
 body {
   background-color: var(--bg-color);
-  color: var(--text-body);
+  color: var(--text-main);
   font-family: var(--font-stack);
+  display: block;
   min-height: 100vh;
-  display: block; 
 }
 
 .glass-navbar {
@@ -47,6 +47,7 @@ body {
   justify-content: space-between;
   align-items: center;
   transition: all 0.3s ease;
+  color: var(--text-body);
 }
 
 .event-card {
@@ -68,6 +69,43 @@ body {
   box-shadow: 0 15px 40px rgba(0,0,0,0.12);
 }
 
+h1 { 
+  font-weight: 700; 
+  font-size: 28px; 
+  letter-spacing: -0.02em; 
+  margin-bottom: 8px; 
+}
+
+.p-tag { 
+  color: var(--text-secondary); 
+  font-size: 15px; 
+  line-height: 1.5; 
+}
+
+.container { 
+  width: 100%; 
+  max-width: 420px; 
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.text-center { 
+  text-align: center; 
+}
+
+.mb-4 { 
+  margin-bottom: 24px; 
+}
+
+.mt-4 { 
+  margin-top: 24px; 
+}
+
 .event-info-right {
   text-align: right;
   display: flex;
@@ -86,6 +124,7 @@ body {
   width: 100%;
   padding: 16px 24px;
   background: var(--input-bg);
+  color: var(--text-body);
   border: none;
   border-radius: 12px;
   font-size: 16px;
@@ -93,8 +132,9 @@ body {
   outline: none;
   transition: background 0.2s;
 }
+
 .search-bar:focus { 
-  background: #eaeaea; 
+  background: #eaeaea;
 }
 
 .filters { 
@@ -107,12 +147,14 @@ body {
   padding: 8px 16px;
   border-radius: 20px;
   border: 1px solid #d2d2d7;
+  color: var(--text-body);
   background: transparent;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 }
+
 .filter-chip.active {
   background: #000;
   color: #fff;
@@ -126,6 +168,24 @@ body {
   margin-top: 40px;
   margin-bottom: 60px;
   align-items: center;
+  color: var(--text-body);
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 24px;
+  font-weight: 500;
+  width: 100%;
+  transition: color 0.2s;
+}
+
+.link-btn:hover {
+  color: var(--text-main);
+  text-decoration: underline;
 }
 
 @keyframes fadeIn {

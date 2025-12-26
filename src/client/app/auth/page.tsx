@@ -59,9 +59,8 @@ export default function AuthPage() {
     <div className="container">
       <Card>
         <div className="text-center mb-4">
-          <div style={{ width: '40px', height: '40px', background: '#000', borderRadius: '50%', margin: '0 auto 15px' }}></div>
           <h1>{isRegistering ? 'Create Account' : 'Welcome Back'}</h1>
-          <p>{isRegistering ? 'Join the reservation system.' : 'Please enter your credentials.'}</p>
+          <p className="p-tag" style={{ marginBottom: '44px' }}>{isRegistering ? 'Join the reservation system.' : 'Please enter your credentials.'}</p>
         </div>
 
         {error && <div className="error-msg">{error}</div>}

@@ -109,22 +109,72 @@ http::HttpRequest Server::parseRequest(const std::string& rawData) {
 
   // Parse request line
   if (std::getline(stream, line)) {
+    // Remove '\r' if present
+    if (!line.empty() && line.back() == '\r') line.pop_back();
+
     std::istringstream lineStream(line);
-    std::string methodStr, path;
-    lineStream >> methodStr >> path;
+    std::string methodStr, fullPath;
+    lineStream >> methodStr >> fullPath;
+    
     req.method = http::HttpRequest::stringToMethod(methodStr);
-    req.path = path;
+
+    // Extract query parameters
+    size_t queryPos = fullPath.find('?');
+    if (queryPos != std::string::npos) {
+      req.path = fullPath.substr(0, queryPos);
+      std::string queryStr = fullPath.substr(queryPos + 1);
+      
+      std::istringstream queryStream(queryStr);
+      std::string segment;
+      while(std::getline(queryStream, segment, '&')) {
+        size_t eqPos = segment.find('=');
+        if(eqPos != std::string::npos) {
+          req.queryParams[segment.substr(0, eqPos)] = segment.substr(eqPos + 1);
+        }
+      }
+    } else {
+      req.path = fullPath;
+    }
   }
 
-  // Skip headers for simplicity
+  // Parse headers
   while (std::getline(stream, line) && line != "\r") {
-    if (line.empty() || line == "\r") break;
+    if (!line.empty() && line.back() == '\r') line.pop_back();
+    if (line.empty()) break;
+
+    size_t colonPos = line.find(':');
+    if (colonPos != std::string::npos) {
+      std::string key = line.substr(0, colonPos);
+      std::string val = line.substr(colonPos + 1);
+      
+      // Trim leading whitespace from value
+      size_t first = val.find_first_not_of(' ');
+      if (first != std::string::npos) {
+        val = val.substr(first);
+      }
+      
+      req.headers[key] = val;
+    }
   }
 
   // Read body
-  std::stringstream bodyStream;
-  bodyStream << stream.rdbuf();
-  req.body = bodyStream.str();
+  if (req.headers.count("Content-Length")) {
+    try {
+      int len = std::stoi(req.headers["Content-Length"]);
+      std::vector<char> bodyBuffer(len);
+      stream.read(bodyBuffer.data(), len);
+      req.body = std::string(bodyBuffer.begin(), bodyBuffer.end());
+    } catch (...) {
+      // Fallback if parsing fails
+      std::stringstream bodyStream;
+      bodyStream << stream.rdbuf();
+      req.body = bodyStream.str();
+    }
+  } else {
+    std::stringstream bodyStream;
+    bodyStream << stream.rdbuf();
+    req.body = bodyStream.str();
+  }
   
   return req;
 }
