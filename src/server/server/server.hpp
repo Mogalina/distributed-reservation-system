@@ -11,13 +11,15 @@
 #include <unistd.h>
 #include "http/http_types.hpp"
 #include "controller/auth_controller.hpp"
+#include "controller/event_controller.hpp"
 
 namespace server {
 
 class Server {
 public:
   Server(const std::string& host, uint16_t port, 
-         controller::AuthController& authController);
+         controller::AuthController& authController,
+         controller::EventController& eventController);
   ~Server();
 
   // Starts the server to listen for incoming connections.
@@ -44,8 +46,9 @@ private:
   uint16_t port_;
   int serverSocket_;
 
-  // Reference to the controller
+  // References to the controllers
   controller::AuthController& authController_;
+  controller::EventController& eventController_;
 
   // Maps client IP addresses to their socket descriptors.
   std::unordered_map<std::string, int> clients_;

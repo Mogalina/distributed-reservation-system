@@ -17,15 +17,15 @@ AuthController::AuthController(service::UserService& userService,
 
 http::HttpResponse AuthController::handleRequest(const http::HttpRequest& req) {
   // Route to appropriate handler based on path and method
-  if (req.path.find("/login") != std::string::npos && 
+  if (req.path.find("/auth/login") != std::string::npos && 
       req.method == http::Method::POST) {
     return login(req);
   }
-  if (req.path.find("/register") != std::string::npos && 
+  if (req.path.find("/auth/register") != std::string::npos && 
       req.method == http::Method::POST) {
     return registerUser(req);
   }
-  if (req.path.find("/logout") != std::string::npos && 
+  if (req.path.find("/auth/logout") != std::string::npos && 
       req.method == http::Method::POST) {
     return logout(req);
   }

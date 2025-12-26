@@ -1,5 +1,6 @@
 add_library(repository STATIC
     user_repository.cpp
+    event_repository.cpp
 )
 
 target_include_directories(repository 

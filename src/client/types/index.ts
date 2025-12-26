@@ -16,3 +16,22 @@ export interface AuthRequestData {
   password: string;
   nationalId?: string;
 }
+
+export interface Event {
+  eventId: string;
+  eventName: string;
+  startTime: string;
+  endTime: string;
+  capacity: number;
+  availableTickets?: number;
+}
+
+export interface PaginatedEvents {
+  data: Event[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}

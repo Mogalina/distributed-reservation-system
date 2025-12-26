@@ -4,6 +4,7 @@ include_directories(${nlohmann_json_INCLUDE_DIRS})
 add_library(controller STATIC 
     user_controller.cpp
     auth_controller.cpp
+    event_controller.cpp
 )
 
 target_include_directories(controller 

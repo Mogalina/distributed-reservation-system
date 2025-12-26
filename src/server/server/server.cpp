@@ -6,8 +6,11 @@
 namespace server {
 
 Server::Server(const std::string& host, uint16_t port, 
-               controller::AuthController& authController)
-    : host_(host), port_(port), authController_(authController) {
+               controller::AuthController& authController,
+               controller::EventController& eventController)
+    : host_(host), port_(port), 
+      authController_(authController),
+      eventController_(eventController) {
   // Create server socket                                                        
   serverSocket_ = socket(AF_INET, SOCK_STREAM, 0);
   if (serverSocket_ < 0) {
@@ -148,9 +151,15 @@ void Server::handleClient(int clientSocket, std::string clientIp) {
     // Handle OPTIONS method for CORS preflight
     if (req.method == http::Method::OPTIONS) {
       resp = http::HttpResponse::make(200);
-    } else {
+    } else if (req.path.find("/auth") == 0) {
       // Delegate to AuthController
       resp = authController_.handleRequest(req);
+    } else if (req.path.find("/events") == 0) {
+      // Delegate to EventController
+      resp = eventController_.handleRequest(req);
+    } else {
+      // Unknown endpoint
+      resp = http::HttpResponse::make(404, "Endpoint not found");
     }
 
     // Format response

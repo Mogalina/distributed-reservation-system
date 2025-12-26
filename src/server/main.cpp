@@ -3,8 +3,11 @@
 #include "server/server.hpp"
 #include "database/sqlite_database.hpp"
 #include "repository/user_repository.hpp"
+#include "repository/event_repository.hpp"
 #include "service/user_service.hpp"
+#include "service/event_service.hpp"
 #include "controller/auth_controller.hpp"
+#include "controller/event_controller.hpp"
 #include "security/jwt.hpp"
 
 int main() {
@@ -24,17 +27,21 @@ int main() {
 
   // Initialize repositories
   repository::UserRepository userRepository(db);
+  repository::EventRepository eventRepository(db);
 
   // Initialize services
   service::UserService userService(userRepository);
+  service::EventService eventService(eventRepository);
 
   // Initialize controllers
   controller::AuthController authController(userService, security);
+  controller::EventController eventController(eventService, security);
 
   // Initialize the server
   server::Server server(variables["SERVER_HOST"], 
                         std::stoi(variables["SERVER_PORT"]),
-                        authController);
+                        authController,
+                        eventController);
 
   // Start listening for incoming connections                      
   server.start();                      

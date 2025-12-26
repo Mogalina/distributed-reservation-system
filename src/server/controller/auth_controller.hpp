@@ -9,7 +9,8 @@ namespace controller {
 // Controller for handling authentication-related HTTP requests
 class AuthController : public RestController {
 public:
-  AuthController(service::UserService& userService, security::Security& security);
+  AuthController(service::UserService& userService, 
+                 security::Security& security);
 
   // Main entry point for handling an HTTP request
   http::HttpResponse handleRequest(const http::HttpRequest& req) override;

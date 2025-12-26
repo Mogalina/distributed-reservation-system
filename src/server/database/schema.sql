@@ -84,17 +84,8 @@ CREATE TABLE IF NOT EXISTS refunds (
         ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_reservations_event
-    ON reservations(event_id);
-
-CREATE INDEX IF NOT EXISTS idx_reservations_user
-    ON reservations(user_id);
-
-CREATE INDEX IF NOT EXISTS idx_users_username
-    ON users(username);
-
-CREATE INDEX IF NOT EXISTS idx_payments_reservation
-    ON payments(reservation_id);
-
-CREATE INDEX IF NOT EXISTS idx_refunds_reservation
-    ON refunds(reservation_id);
+CREATE INDEX IF NOT EXISTS idx_reservations_event ON reservations(event_id);
+CREATE INDEX IF NOT EXISTS idx_reservations_user ON reservations(user_id);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_payments_reservation ON payments(reservation_id);
+CREATE INDEX IF NOT EXISTS idx_refunds_reservation ON refunds(reservation_id);
