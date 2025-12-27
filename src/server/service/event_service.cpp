@@ -20,16 +20,24 @@ std::optional<models::EventDetails> EventService::getEventDetails(
   return eventRepo_.findById(eventId);
 }
 
-bool EventService::reserveTickets(const std::string& userId, 
-                                  const models::ReservationRequest& req) {
+std::string EventService::reserveTickets(
+  const std::string& userId, 
+  const models::ReservationRequest& req
+) {
   // Fetch user to get national ID
   auto userOpt = userRepo_.read(userId);
   if (!userOpt) {
-    return false;
+    return "";
   }
 
   std::string nationalId = userOpt->nationalId; 
   return eventRepo_.createReservation(userId, nationalId, req);
+}
+
+bool EventService::processPayment(const std::string& reservationId, 
+                                  const std::string& nationalId, 
+                                  double amount) {
+  return eventRepo_.confirmPayment(reservationId, nationalId, amount);
 }
 
 }

@@ -23,6 +23,11 @@ http::HttpResponse EventController::handleRequest(
     return handleReserve(req);
   }
 
+  // Handle ticket payment
+  if (req.method == http::Method::POST && req.path == "/events/pay") {
+    return handlePayment(req);
+  }
+
   if (req.method == http::Method::GET) {
     // Check for specific ID
     std::string prefix = "/events/";
@@ -116,9 +121,14 @@ http::HttpResponse EventController::handleReserve(
     auto json = nlohmann::json::parse(req.body);
     models::ReservationRequest resReq = json.get<models::ReservationRequest>();
     
-    if (service_.reserveTickets(userId, resReq)) {
-      return http::HttpResponse::make(201, 
-        R"({"message": "Reservation successful"})");
+    // Retrieve reservation ID
+    std::string resId = service_.reserveTickets(userId, resReq);
+
+    if (!resId.empty()) {
+      nlohmann::json resp;
+      resp["message"] = "Reservation successful";
+      resp["reservationId"] = resId;
+      return http::HttpResponse::make(201, resp.dump());
     } else {
       return http::HttpResponse::make(400, 
         R"({"error": "Reservation failed. Tickets might be sold out."})");
@@ -126,6 +136,32 @@ http::HttpResponse EventController::handleReserve(
 
   } catch (...) {
     return http::HttpResponse::make(400, R"({"error": "Invalid request"})");
+  }
+}
+
+http::HttpResponse EventController::handlePayment(const http::HttpRequest& req) {
+  std::string userId;
+  if (authMiddleware(req, security_, userId).statusCode != 200) {
+    return http::HttpResponse::make(401, R"({"error": "Unauthorized"})");
+  }
+
+  try {
+    auto json = nlohmann::json::parse(req.body);
+    std::string resId = json["reservationId"];
+    std::string nationalId = json.at("nationalId");
+    double amount = json.at("amount");
+
+    if (service_.processPayment(resId, nationalId, amount)) {
+      return http::HttpResponse::make(200, 
+        R"({"message": "Payment confirmed"})");
+    } else {
+      return http::HttpResponse::make(400, 
+        R"({"error": "Payment failed or reservation expired"})");
+    }
+
+  } catch (...) {
+    return http::HttpResponse::make(400, 
+      R"({"error": "Invalid payment request"})");
   }
 }
 

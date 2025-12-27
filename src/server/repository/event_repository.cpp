@@ -170,9 +170,11 @@ std::optional<models::EventDetails> EventRepository::findById(
   return details;
 }
 
-bool EventRepository::createReservation(const std::string& userId, 
-                                        const std::string& nationalId, 
-                                        const models::ReservationRequest& req) {
+std::string EventRepository::createReservation(
+  const std::string& userId, 
+  const std::string& nationalId, 
+  const models::ReservationRequest& req
+) {
   // Check availability and get price
   std::string checkSql = R"(
     SELECT 
@@ -188,7 +190,7 @@ bool EventRepository::createReservation(const std::string& userId,
 
   std::vector<database::Row> rows;
   if (!db_.query(checkSql, rows) || rows.empty()) {
-    return false;
+    return "";
   }
 
   int capacity = 0, sold = 0;
@@ -198,11 +200,11 @@ bool EventRepository::createReservation(const std::string& userId,
     sold = std::stoi(rows[0].columns[1]);
     price = std::stod(rows[0].columns[2]);
   } catch (...) { 
-    return false; 
+    return ""; 
   }
 
   if (sold + req.ticketCount > capacity) {
-    return false;
+    return "";
   }
 
   // Prepare data for insertion
@@ -230,7 +232,11 @@ bool EventRepository::createReservation(const std::string& userId,
             << totalPrice << ", '"
             << timeStr << "')";
 
-  return db_.execute(insertSql.str());
+  if (db_.execute(insertSql.str())) {
+    // Return the generated ID
+    return reservationId;
+  }
+  return "";
 }
 
 bool EventRepository::confirmPayment(const std::string& reservationId, 

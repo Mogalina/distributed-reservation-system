@@ -24,9 +24,9 @@ public:
   std::optional<models::EventDetails> findById(const std::string& eventId);
 
   // Creates a reservation for a user
-  bool createReservation(const std::string& userId, 
-                         const std::string& nationalId, 
-                         const models::ReservationRequest& req);
+  std::string createReservation(const std::string& userId, 
+                                const std::string& nationalId, 
+                                const models::ReservationRequest& req);
 
   // Confirms a reservation payment and records the transaction                    
   bool confirmPayment(const std::string& reservationId, 

@@ -32,8 +32,13 @@ public:
   );
 
   // Creates a reservation for a user
-  bool reserveTickets(const std::string& userId, 
-                      const models::ReservationRequest& req);
+  std::string reserveTickets(const std::string& userId, 
+                             const models::ReservationRequest& req);
+
+  // Processes the reservation payment                
+  bool processPayment(const std::string& reservationId, 
+                      const std::string& nationalId, 
+                      double amount);
 
 private:
   repository::EventRepository& eventRepo_;

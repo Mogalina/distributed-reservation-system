@@ -1,5 +1,6 @@
 # Enviroment files
 .env
+**temp/
 
 # Operating System files
 .DS_Store

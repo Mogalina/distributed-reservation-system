@@ -28,6 +28,8 @@ private:
                                    const std::string& id);
 
   http::HttpResponse handleReserve(const http::HttpRequest& req);
+
+  http::HttpResponse handlePayment(const http::HttpRequest& req);
 };
 
 }  // namespace controller

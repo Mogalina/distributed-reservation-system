@@ -2,7 +2,7 @@
 
 set -e
 
-if [[ "$#" -ne 1 ]]; then
+if [[ "$#" -ne 0 ]]; then
     echo "Invalid number of arguments."
     exit 1
 fi
@@ -13,4 +13,4 @@ cd ./simulation-build/ &&
 cmake ../simulation &&
 make &&
 cd .. &&
-./simulation-build/simulation "$1"
+./simulation-build/simulation ./simulation/temp/users.txt

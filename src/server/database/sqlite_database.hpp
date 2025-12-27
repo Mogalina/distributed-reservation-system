@@ -2,6 +2,7 @@
 
 #include "database.hpp"
 #include <sqlite3.h>
+#include <mutex>
 
 namespace database {
 
@@ -20,6 +21,9 @@ public:
 private:
   // SQLite database connection handle
   sqlite3* db_;
+
+  // Mutex to protect concurrent access to database
+  std::mutex dbMutex_;
 };
 
 }  // namespace database

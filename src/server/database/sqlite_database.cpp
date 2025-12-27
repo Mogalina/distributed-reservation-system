@@ -10,6 +10,7 @@ SqliteDatabase::~SqliteDatabase() {
 }
 
 bool SqliteDatabase::open(const std::string& path) {
+  std::lock_guard<std::mutex> lock(dbMutex_);
   if (sqlite3_open(path.c_str(), &db_) != SQLITE_OK) {
     std::cerr << "Failed to open database: " << sqlite3_errmsg(db_) 
               << std::endl;
@@ -19,6 +20,7 @@ bool SqliteDatabase::open(const std::string& path) {
 }
 
 void SqliteDatabase::close() {
+  std::lock_guard<std::mutex> lock(dbMutex_);
   if (db_) {
     sqlite3_close(db_);
     db_ = nullptr;
@@ -26,6 +28,12 @@ void SqliteDatabase::close() {
 }
 
 bool SqliteDatabase::execute(const std::string& sql) {
+  std::lock_guard<std::mutex> lock(dbMutex_);
+
+  if (!db_) {
+    return false;
+  }
+
   char* error = nullptr;
   if (sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &error) != SQLITE_OK) {
     std::cerr << "SQL error: " << error << std::endl;
@@ -36,6 +44,8 @@ bool SqliteDatabase::execute(const std::string& sql) {
 }
 
 bool SqliteDatabase::query(const std::string& sql, std::vector<Row>& result) {
+  std::lock_guard<std::mutex> lock(dbMutex_);
+  
   sqlite3_stmt* stmt;
   if (sqlite3_prepare_v2(db_, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db_) 
