@@ -1,4 +1,5 @@
 #include "background_service.hpp"
+#include <filesystem>
 
 namespace service {
 
@@ -36,7 +37,10 @@ void BackgroundService::stop() {
 }
 
 void BackgroundService::saveReport() {
-  std::ofstream logFile("system_status.log", std::ios::app);
+  // Ensure logs directory exists
+  std::filesystem::create_directories("logs");
+
+  std::ofstream logFile("logs/system_status.log", std::ios::app);
   
   if (logFile.is_open()) {
     time_t now = time(0);

@@ -6,7 +6,7 @@
 Thumbs.db
 
 # Build files
-build/
+*build*/
 
 # Editor directories and files
 .vscode/
