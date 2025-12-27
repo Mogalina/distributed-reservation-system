@@ -23,6 +23,17 @@ struct UserCredentials {
   std::string password;
 };
 
+std::string generateRandomNationalId() {
+  static std::random_device rd;
+  static std::mt19937_64 gen(rd());
+  static std::uniform_int_distribution<long long> dist(
+    1000000000000LL,
+    9999999999999LL
+  );
+
+  return std::to_string(dist(gen));
+}
+
 void logOutput(const std::string& message) {
   std::lock_guard<std::mutex> lock(logMutex);
   std::cout << message;
@@ -146,7 +157,7 @@ HttpResponse sendHttpRequest(const std::string& host, int port,
 void runClient(int clientId, UserCredentials creds) {
   std::string username = creds.username;
   std::string password = creds.password;
-  std::string nationalId = "NID_" + username + "_" + std::to_string(clientId);
+  std::string nationalId = generateRandomNationalId();
 
   // Register
   std::string regJson = R"({"username":")" + username + 
