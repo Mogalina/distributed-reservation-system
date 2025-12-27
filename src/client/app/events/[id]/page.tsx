@@ -144,7 +144,7 @@ export default function EventPage({ params }: { params: Promise<{ id: string }> 
                 outline: 'none'
             }}
           />
-          <Button onClick={handleReserve} style={{ width: 'auto', padding: '10px 30px', marginBottom: '0' }}>
+          <Button onClick={handleReserve} style={{ width: 'auto', padding: '10px 30px', marginBottom: '12px' }}>
             Reserve Now
           </Button>
         </div>
