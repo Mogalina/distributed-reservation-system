@@ -252,7 +252,7 @@ int main(int argc, char* argv[]) {
   }
 
   logFile.open("logs/simulation.log", std::ios::out | std::ios::trunc);
-  logOutput("Starting simulation...\n");
+  std::cout << "Starting simulation...\n";
 
   std::vector<std::thread> clients;
   for (size_t i = 0; i < users.size(); ++i) {
@@ -261,10 +261,10 @@ int main(int argc, char* argv[]) {
 
   for (auto& client : clients) client.join();
 
-  logOutput("Simulation Completed.\n");
+  std::cout << "Simulation completed successfully.\n";
   if (logFile.is_open()) {
     logFile.close();
   }
-  
+
   return 0;
 }
