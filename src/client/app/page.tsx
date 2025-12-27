@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../hooks/useAuth';
 import { fetchEvents } from '../services/api';
@@ -126,28 +127,34 @@ export default function HomePage() {
             <p style={{ textAlign: 'center', color: '#86868b', marginTop: '40px' }}>Loading events...</p>
           ) : events.length > 0 ? (
             events.map(evt => (
-              <div key={evt.eventId} className="event-card">
-                <div>
-                  <h3 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '4px' }}>{evt.eventName}</h3>
-                  <span style={{ fontSize: '13px', color: '#a1a1a6', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                     Total Capacity: {evt.capacity}
-                  </span>
-                </div>
-                <div className="event-info-right">
-                  <div style={{ fontSize: '16px', fontWeight: 500 }}>
-                    {evt.startTime} - {evt.endTime}
+              <Link 
+                href={`/events/${evt.eventId}`} 
+                key={evt.eventId} 
+                style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+              >
+                <div key={evt.eventId} className="event-card">
+                  <div>
+                    <h3 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '4px' }}>{evt.eventName}</h3>
+                    <span style={{ fontSize: '13px', color: '#a1a1a6', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Total Capacity: {evt.capacity}
+                    </span>
                   </div>
-                  <div style={{ 
-                    fontSize: '13px', 
-                    marginTop: '4px', 
-                    color: (evt.availableTickets || 0) > 0 ? '#4cd964' : '#ff3b30' 
-                  }}>
-                    {(evt.availableTickets || 0) > 0 
-                      ? `${evt.availableTickets} tickets left` 
-                      : 'Sold Out'}
+                  <div className="event-info-right">
+                    <div style={{ fontSize: '16px', fontWeight: 500 }}>
+                      {evt.startTime} - {evt.endTime}
+                    </div>
+                    <div style={{ 
+                      fontSize: '13px', 
+                      marginTop: '4px', 
+                      color: (evt.availableTickets || 0) > 0 ? '#4cd964' : '#ff3b30' 
+                    }}>
+                      {(evt.availableTickets || 0) > 0 
+                        ? `${evt.availableTickets} tickets left` 
+                        : 'Sold Out'}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))
           ) : (
             <p style={{ textAlign: 'center', color: '#86868b', marginTop: '40px' }}>

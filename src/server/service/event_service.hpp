@@ -3,7 +3,8 @@
 #include <vector>
 #include <utility>
 #include "models/event.hpp"
-#include "repository/event_repository.hpp"
+#include "event_repository.hpp"
+#include "user_repository.hpp"
 
 namespace service {
 
@@ -16,7 +17,8 @@ struct EventListResponse {
 
 class EventService {
 public:
-  explicit EventService(repository::EventRepository& repo);
+  explicit EventService(repository::EventRepository& eventRepo,
+                        repository::UserRepository& userRepo);
 
   // Retrieves a list of events with pagination, search, and filtering.
   EventListResponse getEvents(int page, 
@@ -24,8 +26,18 @@ public:
                               const std::string& search, 
                               const std::string& type);
 
+  // Gets single event with category details                           
+  std::optional<models::EventDetails> getEventDetails(
+    const std::string& eventId
+  );
+
+  // Creates a reservation for a user
+  bool reserveTickets(const std::string& userId, 
+                      const models::ReservationRequest& req);
+
 private:
-  repository::EventRepository& repo_;
+  repository::EventRepository& eventRepo_;
+  repository::UserRepository& userRepo_;
 };
 
 }

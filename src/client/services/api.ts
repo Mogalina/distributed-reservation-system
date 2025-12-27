@@ -1,4 +1,10 @@
-import { AuthRequestData, AuthResponse, PaginatedEvents } from '../types';
+import { 
+  AuthRequestData, 
+  AuthResponse, 
+  PaginatedEvents,
+  EventDetails,
+  ReservationRequest, 
+} from '../types';
 
 const API_URL = 'http://127.0.0.1:8080';
 
@@ -45,5 +51,20 @@ export const fetchEvents = (token: string, page: number, limit: number, search: 
     headers: {
       'Authorization': `Bearer ${token}`
     }
+  });
+};
+
+export const fetchEventDetails = (token: string, eventId: string) => {
+  return request<EventDetails>(`events/${eventId}`, {
+    method: 'GET',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+};
+
+export const reserveTickets = (token: string, data: ReservationRequest) => {
+  return request<{ message: string }>(`events/reserve`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify(data)
   });
 };

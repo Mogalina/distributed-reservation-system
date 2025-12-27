@@ -23,6 +23,11 @@ private:
   security::Security& security_;
   
   http::HttpResponse handleGet(const http::HttpRequest& req);
+
+  http::HttpResponse handleGetById(const http::HttpRequest& req, 
+                                   const std::string& id);
+
+  http::HttpResponse handleReserve(const http::HttpRequest& req);
 };
 
 }  // namespace controller

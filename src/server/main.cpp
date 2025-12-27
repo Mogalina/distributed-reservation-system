@@ -31,7 +31,7 @@ int main() {
 
   // Initialize services
   service::UserService userService(userRepository);
-  service::EventService eventService(eventRepository);
+  service::EventService eventService(eventRepository, userRepository);
 
   // Initialize controllers
   controller::AuthController authController(userService, security);

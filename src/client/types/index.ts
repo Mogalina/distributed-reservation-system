@@ -35,3 +35,25 @@ export interface PaginatedEvents {
     totalPages: number;
   };
 }
+
+export interface EventCategory {
+  categoryId: string;
+  name: string;
+  price: number;
+  capacity: number;
+  available: number;
+}
+
+export interface EventDetails {
+  eventId: string;
+  eventName: string;
+  startTime: string;
+  endTime: string;
+  categories: EventCategory[];
+}
+
+export interface ReservationRequest {
+  eventId: string;
+  categoryId: string;
+  ticketCount: number;
+}
