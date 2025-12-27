@@ -1,6 +1,8 @@
 #include <iostream>
 #include "utils/utils.hpp"
 #include "server/server.hpp"
+#include "server/thread_pool.hpp"
+#include "service/background_service.hpp"
 #include "database/sqlite_database.hpp"
 #include "repository/user_repository.hpp"
 #include "repository/event_repository.hpp"
@@ -18,8 +20,8 @@ int main() {
   // Initialize database
   database::SqliteDatabase db;
   if (!db.open("database/reservations.db")) {
-      std::cerr << "Failed to open database" << std::endl;
-      return 1;
+    std::cerr << "Failed to open database" << std::endl;
+    return 1;
   }
 
   // Initialize security
@@ -37,6 +39,13 @@ int main() {
   controller::AuthController authController(userService, security);
   controller::EventController eventController(eventService, security);
 
+  // Initialize background service
+  service::BackgroundService backgroundService(eventRepository);
+
+  // Start background service
+  backgroundService.start(std::stoi(variables["BG_CHECK_INTERVAL_MS"]),
+                          std::stoi(variables["BG_RESERVATION_TIME_S"]));
+
   // Initialize the server
   server::Server server(variables["SERVER_HOST"], 
                         std::stoi(variables["SERVER_PORT"]),
@@ -44,7 +53,18 @@ int main() {
                         eventController);
 
   // Start listening for incoming connections                      
-  server.start();                      
+  std::thread serverThread([&server](){ server.start(); });
+  
+  // Stop server after predefined period of time
+  std::cout << "Server will be running " 
+            << std::stoi(variables["SERVER_RUNTIME_MIN"]) << " minutes...\n";
+  std::this_thread::sleep_for(
+    std::chrono::minutes(std::stoi(variables["SERVER_RUNTIME_MIN"]))
+  );
+  
+  std::cout << "Stopping server...\n";
+  backgroundService.stop();
+  server.stop();
 
-  return 0;
+  exit(0);
 }

@@ -233,4 +233,76 @@ bool EventRepository::createReservation(const std::string& userId,
   return db_.execute(insertSql.str());
 }
 
+bool EventRepository::confirmPayment(const std::string& reservationId, 
+                                     const std::string& cnp, 
+                                     double amount) {
+  // Update reservation status only if it is currently reserved
+  std::string updateSql = "UPDATE reservations SET status = 'SOLD' "
+                          "WHERE reservation_id = '" + reservationId + 
+                          "' AND status = 'RESERVED'";
+
+  // If reservation update fails, payment cannot be confirmed
+  if (!db_.execute(updateSql)) {
+    return false;
+  }
+
+  // Generate unique payment ID
+  std::string payId = utils::generateUUID();
+
+  // Generate payment timestamp
+  time_t now = time(0);
+  std::string timeStr = ctime(&now);
+  if (!timeStr.empty()) {
+    timeStr.pop_back();
+  }
+
+  // Insert payment record
+  std::stringstream paySql;
+  paySql << "INSERT INTO payments ("
+         << "  payment_id, "
+         << "  reservation_id, "
+         << "  payment_date, "
+         << "  national_id, "
+         << "  amount) "
+         << "VALUES ('"
+         << payId << "', '" 
+         << reservationId << "', '" 
+         << timeStr << "', '" 
+         << cnp << "', " 
+         << amount << ")";
+
+  return db_.execute(paySql.str());
+}
+
+int EventRepository::cancelExpiredReservations(int timeoutSeconds) {
+  // Select all active reservations
+  std::string sql = "SELECT reservation_id, reservation_time "
+                    "FROM reservations "
+                    "WHERE status = 'RESERVED'";
+  std::vector<database::Row> rows;
+  int count = 0;
+  
+  if (db_.query(sql, rows)) {
+    time_t now = time(0);
+    for (const auto& row : rows) {
+      std::string resId = row.columns[0];
+
+      // Cancel reservation
+      std::string cancelSql = "UPDATE reservations SET status = 'CANCELLED' "
+                              "WHERE reservation_id = '" + resId + "'";
+                              
+      if(db_.execute(cancelSql)) {
+        count++;
+      }
+    }
+  }
+  return count;
+}
+
+std::string EventRepository::generateStockReport() {
+  std::stringstream report;
+  report << "=== STOCK REPORT ===\n";
+  return report.str();
+}
+
 }

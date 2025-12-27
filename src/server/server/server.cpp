@@ -10,7 +10,8 @@ Server::Server(const std::string& host, uint16_t port,
                controller::EventController& eventController)
     : host_(host), port_(port), 
       authController_(authController),
-      eventController_(eventController) {
+      eventController_(eventController),
+      threadPool_(4) {
   // Create server socket                                                        
   serverSocket_ = socket(AF_INET, SOCK_STREAM, 0);
   if (serverSocket_ < 0) {
@@ -58,7 +59,7 @@ Server::~Server() {
   {
     std::lock_guard<std::mutex> lock(clientsMutex_);
     for (auto& client : clients_) {
-        close(client.second);
+      close(client.second);
     }
     clients_.clear();
   }
@@ -74,6 +75,37 @@ void Server::start() {
   isRunning_ = true;
   std::cout << "Server running on " << host_ << ":" << port_ << std::endl;
   acceptThread_.join();
+}
+
+void Server::stop() {
+  // Prevent multiple stop calls
+  if (!isRunning_) {
+    return;
+  }
+
+  // Signal server shutdown
+  isRunning_ = false;
+
+  // Shutdown server socket to unblock accept()
+  shutdown(serverSocket_, SHUT_RDWR);
+  close(serverSocket_);
+
+  // Close all active client connections
+  {
+    std::lock_guard<std::mutex> lock(clientsMutex_);
+    for (auto& client : clients_) {
+      shutdown(client.second, SHUT_RDWR);
+      close(client.second);
+    }
+    clients_.clear();
+  }
+
+  // Wait for accept thread to finish
+  if (acceptThread_.joinable()) {
+    acceptThread_.join();
+  }
+
+  std::cout << "Server stopped successfully." << std::endl;
 }
 
 void Server::acceptConnections() {
@@ -97,7 +129,9 @@ void Server::acceptConnections() {
     }
 
     // Handle client communication in a separate thread
-    std::thread(&Server::handleClient, this, clientSocket, clientIp).detach();
+    threadPool_.enqueue([this, clientSocket, clientIp] {
+      this->handleClient(clientSocket, clientIp);
+    });
     std::cout << "Client connected: " << clientIp << std::endl;
   }
 }

@@ -1,6 +1,7 @@
 add_library(service STATIC
     user_service.cpp
     event_service.cpp
+    background_service.cpp
 )
 
 target_include_directories(service

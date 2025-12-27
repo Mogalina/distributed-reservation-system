@@ -28,6 +28,18 @@ public:
                          const std::string& nationalId, 
                          const models::ReservationRequest& req);
 
+  // Confirms a reservation payment and records the transaction                    
+  bool confirmPayment(const std::string& reservationId, 
+                      const std::string& cnp,
+                      double amount);
+
+                
+  // Cancels all expired reservations                    
+  int cancelExpiredReservations(int timeoutSeconds);
+
+  // Generates a stock report for event ticket availability
+  std::string generateStockReport();
+
 private:
   database::SqliteDatabase& db_;
 };

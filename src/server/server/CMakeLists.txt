@@ -1,5 +1,6 @@
 add_library(server STATIC
     server.cpp
+    thread_pool.cpp
 )
 
 target_include_directories(server
